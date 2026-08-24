@@ -11,6 +11,7 @@ from dream_lens.models import FindingState
 from dream_lens.rules import finance_chain, orphan_relationship, outcome_evidence, source_drift
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_record.json"
+EXPECTED_INFERENCE_BOUNDARY = "Findings describe evidence state and deterministic consistency only; they do not establish cause, intent, responsibility, attribution, ownership, or legal conclusions."
 
 
 class EvidenceTests(unittest.TestCase):
@@ -27,7 +28,7 @@ class RuleTests(unittest.TestCase):
     def test_source_drift_consistent(self) -> None:
         self.assertEqual(source_drift(subject="p:status", left_value="a", right_value="a", left_label="api", right_label="portal").state, FindingState.CONSISTENT)
 
-    def test_source_drift_contradictory_is_not_misconduct_claim(self) -> None:
+    def test_source_drift_contradictory_preserves_inference_boundary(self) -> None:
         finding = source_drift(subject="p:status", left_value="a", right_value="b", left_label="api", right_label="portal")
         self.assertEqual(finding.state, FindingState.CONTRADICTORY)
         self.assertIn("representation-level", finding.interpretation)
@@ -61,14 +62,22 @@ class EngineTests(unittest.TestCase):
         allowed = {state.value for state in FindingState}
         self.assertTrue(all(item["state"] in allowed for item in bundle["findings"]))
 
+    def test_bundle_inference_boundary_is_attribution_neutral(self) -> None:
+        record = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        bundle = evaluate(record)
+        self.assertEqual(bundle["inference_boundary"], EXPECTED_INFERENCE_BOUNDARY)
+
 
 class AdapterBoundaryTests(unittest.TestCase):
     def test_rejects_non_allowlisted_host(self) -> None:
         with self.assertRaises(ValueError): DreamPublicApiClient(base_url="https://example.com")
+
     def test_rejects_non_https(self) -> None:
         with self.assertRaises(ValueError): DreamPublicApiClient(base_url="http://public-api.dream.gov.ua")
+
     def test_rejects_path_in_base_url(self) -> None:
         with self.assertRaises(ValueError): DreamPublicApiClient(base_url="https://public-api.dream.gov.ua/other")
+
     def test_rejects_project_id_path_escape(self) -> None:
         with self.assertRaises(ValueError): DreamPublicApiClient().get_project("../secret")
 
