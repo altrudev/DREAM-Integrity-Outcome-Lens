@@ -70,6 +70,22 @@ def _selected_active_approach(approaches: list[Any]) -> dict[str, Any] | None:
     return max(active, key=lambda item: (_budget_breakdown_total(item), str(item.get("id") or "")))
 
 
+def _budget_finance_ids(classifications: Any) -> set[str]:
+    ids: set[str] = set()
+    items = classifications if isinstance(classifications, list) else [classifications]
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        direct = item.get("budgetFinanceId")
+        if isinstance(direct, list):
+            ids.update(str(value) for value in direct if value not in (None, ""))
+        elif direct not in (None, ""):
+            ids.add(str(direct))
+        if item.get("scheme") == "budgetFinanceId" and item.get("id") not in (None, ""):
+            ids.add(str(item["id"]))
+    return ids
+
+
 def _finance_values(approach: dict[str, Any] | None) -> dict[str, str | None]:
     result: dict[str, Decimal] = {
         "expected": Decimal("0"),
@@ -82,9 +98,12 @@ def _finance_values(approach: dict[str, Any] | None) -> dict[str, str | None]:
         return {key: None for key in result}
 
     budget = approach.get("budget") if isinstance(approach.get("budget"), dict) else {}
+    finance_ids: set[str] = set()
     for item in budget.get("finance", []) or []:
         if not isinstance(item, dict):
             continue
+        if item.get("id") not in (None, ""):
+            finance_ids.add(str(item["id"]))
         amount = _amount_from_value(item.get("value"))
         if amount is not None:
             result["expected"] += amount
@@ -94,6 +113,9 @@ def _finance_values(approach: dict[str, Any] | None) -> dict[str, str | None]:
     financial_progress = implementation.get("financialProgress") if isinstance(implementation.get("financialProgress"), dict) else {}
     for item in financial_progress.get("breakdown", []) or []:
         if not isinstance(item, dict):
+            continue
+        linked_ids = _budget_finance_ids(item.get("classifications"))
+        if linked_ids and finance_ids and linked_ids.isdisjoint(finance_ids):
             continue
         measure = item.get("measure") if isinstance(item.get("measure"), dict) else {}
         for key in ("available", "disbursed", "spent"):
@@ -153,6 +175,7 @@ def normalize_public_project(payload: dict[str, Any]) -> dict[str, Any]:
         "finance": _finance_values(selected),
         "normalization_notes": [
             "Active technical approach selection is deterministic: highest budget valueBreakdown total, then id tie-break.",
+            "Financial progress honors budgetFinanceId links when they are present.",
             "Derived values are Lens observations and do not replace source-system authority.",
         ],
     }
