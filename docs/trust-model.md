@@ -10,7 +10,7 @@ The implementation keeps these concepts separate:
 
 **Detection ≠ Provenance ≠ Attribution ≠ Authority ≠ Ownership.**
 
-A detected inconsistency is an observation. Provenance identifies where the compared evidence came from. Neither step proves who caused a difference, which actor has legal authority, who owns underlying material, or whether misconduct occurred.
+A detected inconsistency is an observation. Provenance identifies where the compared evidence came from. Neither step proves cause, intent, responsibility, legal authority, ownership, or legal consequence.
 
 Every finding must preserve the observed subject, source, authority scope where known, observation time, evidence hash where available, deterministic rule, finding state, bounded interpretation, and additional evidence required before stronger conclusions.
 
@@ -22,7 +22,7 @@ Source adapters do not upgrade the Lens into an authoritative registry. Source s
 
 The automated finding taxonomy is closed: `CONSISTENT`, `INCOMPLETE`, `STALE`, `CONTRADICTORY`, `UNRESOLVED`, `OUTCOME_NOT_YET_MEASURABLE`, and `REQUIRES_HUMAN_REVIEW`.
 
-The engine does not emit automated conclusions such as corruption, fraud, theft, criminality, guilt, ownership, or legal liability.
+The engine does not emit automated conclusions about cause, intent, responsibility, attribution, guilt, ownership, legal liability, or enforcement status.
 
 ## Input trust
 
@@ -38,4 +38,4 @@ Rules operate on normalized records and captured source snapshots. JSON evidence
 
 ## Human approval
 
-A finding can prioritize evidence review but cannot autonomously escalate itself into an accusation or enforcement action. Stronger interpretations require a human reviewer and independently sufficient evidence appropriate to the relevant legal or administrative process.
+A finding can prioritize evidence review but cannot autonomously escalate itself into attribution, accusation, enforcement, or other authority-bearing action. Stronger interpretations require a human reviewer and independently sufficient evidence appropriate to the relevant legal or administrative process.
