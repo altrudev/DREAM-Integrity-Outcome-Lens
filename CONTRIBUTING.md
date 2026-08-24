@@ -9,7 +9,7 @@ Repository-authored user-facing material should be Ukrainian or English. Russian
 ## Contribution rules
 
 1. Keep source adapters read-only unless a future governance decision explicitly changes that boundary.
-2. Do not add automated accusation states or unsupported corruption/fraud conclusions.
+2. Do not add automated conclusions about cause, intent, responsibility, attribution, ownership, guilt, or legal liability from an evidence anomaly alone.
 3. Add tests for every rule transition.
 4. Preserve source authority; do not present Lens-derived fields as official government records.
 5. Keep transformations deterministic or explicitly document non-determinism.
