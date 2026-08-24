@@ -21,7 +21,7 @@ def source_drift(*, subject: str, left_value: Any, right_value: Any, left_label:
     refs = _evidence_tuple(evidence)
     if left_value is None or right_value is None:
         missing = left_label if left_value is None else right_label
-        return Finding(RULE_SOURCE_DRIFT, FindingState.INCOMPLETE, subject, f"Cannot compare representations because {missing} is absent.", "The consistency question is unresolved; absence is not evidence of misconduct.", refs, (f"Acquire the missing {missing} representation.",))
+        return Finding(RULE_SOURCE_DRIFT, FindingState.INCOMPLETE, subject, f"Cannot compare representations because {missing} is absent.", "The consistency question is unresolved; absence does not establish cause, responsibility, or invalidity.", refs, (f"Acquire the missing {missing} representation.",))
     if left_value == right_value:
         return Finding(RULE_SOURCE_DRIFT, FindingState.CONSISTENT, subject, f"{left_label} and {right_label} represent the same value.", "No source-representation inconsistency was observed for this field.", refs)
     return Finding(RULE_SOURCE_DRIFT, FindingState.CONTRADICTORY, subject, f"{left_label} and {right_label} represent different values.", "This is a representation-level contradiction only. Synchronization delay, revision, mapping differences, or data error remain possible explanations.", refs, ("Check authoritative revision history and source timestamps.",))
@@ -53,7 +53,7 @@ def finance_chain(*, subject: str, expected: Any, available: Any, disbursed: Any
         missing = [name for name, value in parsed.items() if value is None]
         return Finding(RULE_FINANCE_CHAIN, FindingState.INCOMPLETE, subject, f"Financial chain cannot be evaluated for fields: {', '.join(missing)}.", "Missing or non-numeric values prevent a deterministic comparison.", refs, ("Acquire numeric values for all compared finance fields from the same observation scope.",))
     if any(value < 0 for value in parsed.values() if value is not None):
-        return Finding(RULE_FINANCE_CHAIN, FindingState.REQUIRES_HUMAN_REVIEW, subject, "At least one financing value is negative.", "The value requires semantic review because adjustments or accounting conventions may explain it. No misconduct inference is made.", refs, ("Verify finance-field semantics and authoritative adjustment records.",))
+        return Finding(RULE_FINANCE_CHAIN, FindingState.REQUIRES_HUMAN_REVIEW, subject, "At least one financing value is negative.", "The value requires semantic review because adjustments or accounting conventions may explain it. No cause, responsibility, or legal conclusion is inferred.", refs, ("Verify finance-field semantics and authoritative adjustment records.",))
     exp, avail, disb, used = parsed["expected"], parsed["available"], parsed["disbursed"], parsed["spent"]
     assert exp is not None and avail is not None and disb is not None and used is not None
     violations: list[str] = []
