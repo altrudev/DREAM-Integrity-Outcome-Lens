@@ -1,0 +1,19 @@
+{
+  "project_id": "DREAM-UA-070825-07BFF93A",
+  "title": "Development of the Trans-European Transport Network",
+  "evidence": [
+    {
+      "source": "DREAM public portal",
+      "source_id": "DREAM-UA-070825-07BFF93A",
+      "authority_scope": "DREAM public project representation",
+      "observed_at": "2026-08-24",
+      "sha256": null
+    }
+  ],
+  "source_url": "https://dream.gov.ua/pip/DREAM-UA-070825-07BFF93A?fromUri=%2Fspp-pipeline",
+  "timeline": {
+    "project_duration_months": 72,
+    "feasibility_months": 24,
+    "implementation_months": 48
+  }
+}
