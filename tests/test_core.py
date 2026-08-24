@@ -46,7 +46,14 @@ class NormalizationTests(unittest.TestCase):
                             "valueBreakdown": [{"value": {"amount": 20}}, {"value": {"amount": 5}}],
                             "finance": [{"id": "f1", "value": {"amount": 25}}],
                         },
-                        "implementation": {"financialProgress": {"breakdown": [{"measure": {"available": 20, "disbursed": 15, "spent": 10}}]}},
+                        "implementation": {
+                            "financialProgress": {
+                                "breakdown": [
+                                    {"classifications": {"budgetFinanceId": "f1"}, "measure": {"available": 20, "disbursed": 15, "spent": 10}},
+                                    {"classifications": {"budgetFinanceId": "other-source"}, "measure": {"available": 999, "disbursed": 999, "spent": 999}},
+                                ]
+                            }
+                        },
                     },
                 ],
             },
