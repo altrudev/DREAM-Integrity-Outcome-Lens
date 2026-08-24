@@ -1,29 +1,94 @@
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
-ALLOWED_FINDING_STATES = {"CONSISTENT", "INCOMPLETE", "STALE", "CONTRADICTORY", "UNRESOLVED", "OUTCOME_NOT_YET_MEASURABLE", "REQUIRES_HUMAN_REVIEW"}
-FORBIDDEN_AUTOMATED_STATES = {"CORRUPT", "FRAUD", "CRIMINAL", "THEFT", "GUILTY"}
+TESTS = ROOT / "tests"
+
+ALLOWED_FINDING_STATES = {
+    "CONSISTENT",
+    "INCOMPLETE",
+    "STALE",
+    "CONTRADICTORY",
+    "UNRESOLVED",
+    "OUTCOME_NOT_YET_MEASURABLE",
+    "REQUIRES_HUMAN_REVIEW",
+}
+EXPECTED_INFERENCE_BOUNDARY = (
+    "Findings describe evidence state and deterministic consistency only; "
+    "they do not establish cause, intent, responsibility, attribution, ownership, or legal conclusions."
+)
+EXPECTED_DREAM_HOSTS = {"public-api.dream.gov.ua"}
+PUBLIC_POSITIONING_DOCS = (
+    ROOT / "README.md",
+    ROOT / "CONTRIBUTING.md",
+    ROOT / "docs" / "rule-catalog.md",
+    ROOT / "docs" / "trust-model.md",
+)
+DOMAIN_SPECIFIC_FOREGROUNDING_TERMS = ("corruption", "fraud", "theft", "criminality", "misconduct")
+DISALLOWED_HTTP_WRITE_MARKERS = ('method="POST"', "method='POST'", 'method="PUT"', "method='PUT'", 'method="PATCH"', "method='PATCH'", 'method="DELETE"', "method='DELETE'")
 
 
 def main() -> int:
     failures: list[str] = []
-    for path in list(SRC.rglob("*.py")) + list((ROOT / "tests").rglob("*.py")):
+
+    python_paths = list(SRC.rglob("*.py")) + list(TESTS.rglob("*.py")) + [Path(__file__)]
+    for path in python_paths:
         try:
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         except SyntaxError as exc:
             failures.append(f"syntax: {path}: {exc}")
+
+    from dream_lens.adapters.dream import ALLOWED_HOSTS
+    from dream_lens.engine import evaluate
     from dream_lens.models import FindingState
-    actual = {state.value for state in FindingState}
-    if actual != ALLOWED_FINDING_STATES: failures.append(f"finding taxonomy drift: {sorted(actual)}")
-    if actual & FORBIDDEN_AUTOMATED_STATES: failures.append(f"forbidden automated conclusion states: {sorted(actual & FORBIDDEN_AUTOMATED_STATES)}")
+
+    actual_states = {state.value for state in FindingState}
+    if actual_states != ALLOWED_FINDING_STATES:
+        failures.append(f"finding taxonomy drift: {sorted(actual_states)}")
+
+    if set(ALLOWED_HOSTS) != EXPECTED_DREAM_HOSTS:
+        failures.append(f"network authority drift: {sorted(ALLOWED_HOSTS)}")
+
+    fixture_path = TESTS / "fixtures" / "sample_record.json"
+    record = json.loads(fixture_path.read_text(encoding="utf-8"))
+    first = evaluate(record)
+    second = evaluate(record)
+    if first != second:
+        failures.append("determinism: identical normalized input produced different bundles")
+    if first.get("inference_boundary") != EXPECTED_INFERENCE_BOUNDARY:
+        failures.append("inference boundary drift")
+    emitted_states = {item.get("state") for item in first.get("findings", [])}
+    if not emitted_states.issubset(ALLOWED_FINDING_STATES):
+        failures.append(f"emitted state outside closed taxonomy: {sorted(emitted_states - ALLOWED_FINDING_STATES)}")
+
+    adapter_text = (SRC / "dream_lens" / "adapters" / "dream.py").read_text(encoding="utf-8")
+    for marker in DISALLOWED_HTTP_WRITE_MARKERS:
+        if marker in adapter_text:
+            failures.append(f"write-capable HTTP method marker found in DREAM adapter: {marker}")
+
+    for path in PUBLIC_POSITIONING_DOCS:
+        text = path.read_text(encoding="utf-8").lower()
+        for term in DOMAIN_SPECIFIC_FOREGROUNDING_TERMS:
+            if term in text:
+                failures.append(f"positioning drift: {path.relative_to(ROOT)} foregrounds '{term}'")
+
     if failures:
-        for failure in failures: print(f"FAIL {failure}")
+        for failure in failures:
+            print(f"FAIL {failure}")
         return 1
-    print("PASS DDC audit: syntax, closed finding taxonomy, inference boundary")
+
+    print("PASS DDC audit")
+    print("  syntax: pass")
+    print("  closed finding taxonomy: pass")
+    print("  deterministic evidence bundle: pass")
+    print("  neutral inference boundary: pass")
+    print("  fixed DREAM network authority: pass")
+    print("  read-only HTTP boundary: pass")
+    print("  public positioning boundary: pass")
     return 0
 
 
