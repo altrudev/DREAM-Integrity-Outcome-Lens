@@ -4,9 +4,9 @@ from typing import Any
 
 from .evidence import sha256_json
 from .models import EvidenceRef, Finding
-from .rules import finance_chain, orphan_relationship, outcome_evidence, required_evidence, source_drift
+from .rules import finance_chain, orphan_relationship, outcome_evidence, required_evidence, source_drift, temporal_plausibility
 
-BUNDLE_VERSION = "0.1"
+BUNDLE_VERSION = "0.2"
 
 
 def _refs(record: dict[str, Any]) -> tuple[EvidenceRef, ...]:
@@ -28,6 +28,9 @@ def evaluate(record: dict[str, Any]) -> dict[str, Any]:
     finance = record.get("finance")
     if isinstance(finance, dict):
         findings.append(finance_chain(subject=f"{project_id}:finance", expected=finance.get("expected"), available=finance.get("available"), disbursed=finance.get("disbursed"), spent=finance.get("spent"), evidence=refs))
+    timeline = record.get("timeline")
+    if isinstance(timeline, dict):
+        findings.append(temporal_plausibility(subject=f"{project_id}:timeline", project_duration_months=timeline.get("project_duration_months"), feasibility_months=timeline.get("feasibility_months"), implementation_months=timeline.get("implementation_months"), evidence=refs))
     outcome = record.get("outcome")
     if isinstance(outcome, dict):
         findings.append(outcome_evidence(subject=f"{project_id}:outcome", completed=bool(outcome.get("completed", False)), expected_outcomes=outcome.get("expected_outcomes"), measured_outcomes=outcome.get("measured_outcomes"), evidence=refs))
