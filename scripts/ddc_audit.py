@@ -28,6 +28,7 @@ PUBLIC_POSITIONING_DOCS = (
     ROOT / "CONTRIBUTING.md",
     ROOT / "docs" / "rule-catalog.md",
     ROOT / "docs" / "trust-model.md",
+    ROOT / "docs" / "evidence-report-2026-08-24.md",
 )
 DOMAIN_SPECIFIC_FOREGROUNDING_TERMS = ("corruption", "fraud", "theft", "criminality", "misconduct")
 DISALLOWED_HTTP_WRITE_MARKERS = ('method="POST"', "method='POST'", 'method="PUT"', "method='PUT'", 'method="PATCH"', "method='PATCH'", 'method="DELETE"', "method='DELETE'")
