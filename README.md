@@ -4,11 +4,11 @@ Independent civic-tech tooling for deterministic evidence lineage, consistency c
 
 **Status: v0.1 integrity core — research prototype.**
 
-> This project is not an official DREAM component. It does not infer corruption, fraud, criminality, ownership, attribution, or legal liability from anomalies. It produces bounded, evidence-backed consistency findings for human review.
+> This project is not an official DREAM component. It produces bounded, evidence-backed consistency findings for human review. An observed anomaly does not by itself establish cause, intent, responsibility, attribution, ownership, or a legal conclusion.
 
 ## Why this exists
 
-DREAM exposes public investment and reconstruction data, while adjacent Ukrainian systems cover procurement, financing, implementation, monitoring, and risk management. The useful gap is not another opaque risk score. It is a reproducible way to answer:
+DREAM exposes public investment and reconstruction data, while adjacent Ukrainian systems cover procurement, financing, implementation, monitoring, and risk management. The useful gap is a reproducible way to answer:
 
 **Does the public evidence preserve the same project, authority, financing, state transition, implementation record, and measurable outcome across the chain?**
 
@@ -67,7 +67,7 @@ See [`docs/trust-model.md`](docs/trust-model.md) for the authority and inference
 | `DIO-OUT-001` | Check expected outcome measurement coverage |
 | `DIO-EVID-001` | Check required transition-evidence presence |
 
-These rules deliberately detect evidence states, not wrongdoing. See [`docs/rule-catalog.md`](docs/rule-catalog.md).
+These rules classify evidence states. They do not determine why an anomaly exists or who is responsible for it. See [`docs/rule-catalog.md`](docs/rule-catalog.md).
 
 ## Quick start
 
