@@ -11,6 +11,7 @@ RULE_ORPHAN_RELATIONSHIP = "DIO-REL-001"
 RULE_FINANCE_CHAIN = "DIO-FIN-001"
 RULE_OUTCOME_EVIDENCE = "DIO-OUT-001"
 RULE_REQUIRED_EVIDENCE = "DIO-EVID-001"
+RULE_TEMPORAL_PLAUSIBILITY = "DIO-TIME-001"
 
 
 def _evidence_tuple(items: Iterable[EvidenceRef] | None) -> tuple[EvidenceRef, ...]:
@@ -63,6 +64,22 @@ def finance_chain(*, subject: str, expected: Any, available: Any, disbursed: Any
     if violations:
         return Finding(RULE_FINANCE_CHAIN, FindingState.REQUIRES_HUMAN_REVIEW, subject, "Financial ordering differs from the provisional comparison model: " + "; ".join(violations) + ".", "This rule is a consistency lens, not an accounting judgment. Timing, revisions, classification, or field semantics can legitimately produce these relationships.", refs, ("Check funding revisions, field definitions, and observation timestamps before interpretation.",))
     return Finding(RULE_FINANCE_CHAIN, FindingState.CONSISTENT, subject, "The observed finance values satisfy expected ≥ available ≥ disbursed ≥ spent.", "No inconsistency was found under the provisional finance-ordering rule.", refs)
+
+
+def temporal_plausibility(*, subject: str, project_duration_months: Any, feasibility_months: Any = None, implementation_months: Any = None, max_review_months: int = 1200, evidence: Iterable[EvidenceRef] | None = None) -> Finding:
+    refs = _evidence_tuple(evidence)
+    project = _decimal(project_duration_months)
+    feasibility = _decimal(feasibility_months)
+    implementation = _decimal(implementation_months)
+    if project is None:
+        return Finding(RULE_TEMPORAL_PLAUSIBILITY, FindingState.INCOMPLETE, subject, "Project duration is absent or non-numeric.", "The timeline cannot be evaluated.", refs, ("Acquire the represented project duration and unit.",))
+    if project < 0 or (feasibility is not None and feasibility < 0) or (implementation is not None and implementation < 0):
+        return Finding(RULE_TEMPORAL_PLAUSIBILITY, FindingState.REQUIRES_HUMAN_REVIEW, subject, "At least one represented duration is negative.", "The duration requires source-semantic review; no cause or responsibility is inferred.", refs, ("Verify source duration values and units.",))
+    if feasibility is not None and implementation is not None and feasibility + implementation != project:
+        return Finding(RULE_TEMPORAL_PLAUSIBILITY, FindingState.CONTRADICTORY, subject, f"Project duration {project} months does not equal feasibility + implementation ({feasibility + implementation} months).", "This is a numeric representation contradiction only; source definitions or stage overlap may explain it.", refs, ("Verify authoritative duration definitions and whether stages overlap.",))
+    if project > Decimal(max_review_months):
+        return Finding(RULE_TEMPORAL_PLAUSIBILITY, FindingState.REQUIRES_HUMAN_REVIEW, subject, f"Project duration is represented as {project} months, above the review threshold of {max_review_months} months.", "The value is internally arithmetic-consistent where subperiods are supplied, but its unit or magnitude warrants source review. No cause, intent, responsibility, or legal conclusion is inferred.", refs, ("Verify the source unit, data-entry value, and authoritative project schedule.",))
+    return Finding(RULE_TEMPORAL_PLAUSIBILITY, FindingState.CONSISTENT, subject, f"Project duration {project} months is within the configured review threshold.", "No timeline plausibility issue was observed under this rule.", refs)
 
 
 def outcome_evidence(*, subject: str, completed: bool, expected_outcomes: list[str] | None, measured_outcomes: dict[str, Any] | None, evidence: Iterable[EvidenceRef] | None = None) -> Finding:
