@@ -4,9 +4,9 @@ The v0.1 rules are intentionally narrow. Their purpose is to prove the evidence 
 
 | Rule | Subject | Output on anomaly | Non-conclusion |
 |---|---|---|---|
-| `DIO-SOURCE-001` | Two representations of one field | `CONTRADICTORY` | Does not identify cause or misconduct |
+| `DIO-SOURCE-001` | Two representations of one field | `CONTRADICTORY` | Does not identify cause or responsible actor |
 | `DIO-REL-001` | Related-process identifier | `UNRESOLVED` | Does not declare the upstream relation invalid |
-| `DIO-FIN-001` | expected → available → disbursed → spent | `REQUIRES_HUMAN_REVIEW` | Does not make an accounting or corruption judgment |
+| `DIO-FIN-001` | expected → available → disbursed → spent | `REQUIRES_HUMAN_REVIEW` | Does not determine accounting cause, intent, responsibility, or legal status |
 | `DIO-OUT-001` | Expected vs measured outcome evidence | `INCOMPLETE` | Does not conclude the outcome failed |
 | `DIO-EVID-001` | Required transition evidence | `INCOMPLETE` | Does not conclude the transition was unlawful |
 
@@ -22,7 +22,7 @@ Checks whether an observed related-process identifier resolves inside the eviden
 
 ## DIO-FIN-001 — provisional finance ordering
 
-Compares values using the provisional ordering `expected ≥ available ≥ disbursed ≥ spent`. The field semantics are based on currently documented DREAM Analytics mappings. Because timing, revisions and accounting semantics can legitimately break this ordering, a difference yields `REQUIRES_HUMAN_REVIEW`, never a misconduct label.
+Compares values using the provisional ordering `expected ≥ available ≥ disbursed ≥ spent`. The field semantics are based on currently documented DREAM Analytics mappings. Because timing, revisions and accounting semantics can legitimately break this ordering, a difference yields `REQUIRES_HUMAN_REVIEW`. The rule does not infer cause, intent, responsibility, or legal status.
 
 ## DIO-OUT-001 — outcome evidence coverage
 
