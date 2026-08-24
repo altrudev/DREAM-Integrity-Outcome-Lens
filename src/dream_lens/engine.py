@@ -34,5 +34,11 @@ def evaluate(record: dict[str, Any]) -> dict[str, Any]:
     transition_evidence = record.get("transition_evidence")
     if isinstance(transition_evidence, dict):
         findings.append(required_evidence(subject=f"{project_id}:transition-evidence", required_keys=list(transition_evidence.get("required_keys", [])), evidence_record=dict(transition_evidence.get("record", {})), evidence=refs))
-    bundle_core = {"bundle_version": BUNDLE_VERSION, "project_id": project_id, "record_sha256": sha256_json(record), "findings": [finding.as_dict() for finding in findings], "inference_boundary": "Findings describe evidence state and deterministic consistency only; they do not establish corruption, fraud, criminality, attribution, ownership, or legal liability."}
+    bundle_core = {
+        "bundle_version": BUNDLE_VERSION,
+        "project_id": project_id,
+        "record_sha256": sha256_json(record),
+        "findings": [finding.as_dict() for finding in findings],
+        "inference_boundary": "Findings describe evidence state and deterministic consistency only; they do not establish cause, intent, responsibility, attribution, ownership, or legal conclusions.",
+    }
     return {**bundle_core, "bundle_sha256": sha256_json(bundle_core)}
