@@ -1,0 +1,19 @@
+{
+  "project_id": "DREAM-UA-040825-30FC5B9E",
+  "title": "«Зміцнення системи охорони здоров'я та збереження життя» (HEAL Ukraine)",
+  "evidence": [
+    {
+      "source": "DREAM public portal",
+      "source_id": "DREAM-UA-040825-30FC5B9E",
+      "authority_scope": "DREAM public project representation",
+      "observed_at": "2026-08-24",
+      "sha256": null
+    }
+  ],
+  "source_url": "https://dream.gov.ua/ua/pip/DREAM-UA-040825-30FC5B9E?fromUri=%2Fspp-pipeline",
+  "timeline": {
+    "project_duration_months": 48576,
+    "feasibility_months": 24264,
+    "implementation_months": 24312
+  }
+}
