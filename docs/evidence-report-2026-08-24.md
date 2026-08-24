@@ -29,6 +29,7 @@ Lens finding:
 - state: `REQUIRES_HUMAN_REVIEW`
 - reason: the represented duration is internally arithmetic-consistent but substantially above the configured review threshold
 - next evidence: verify the authoritative unit, source value, and project schedule
+- deterministic bundle SHA-256: `3e3319b4b02cb1888d045b8b86e77d09559ad95f5f55dc7a4bb71b96591d5f7a`
 
 The Lens does not infer why the values are represented this way.
 
@@ -50,6 +51,7 @@ Lens finding:
 - rule: `DIO-TIME-001`
 - state: `CONSISTENT`
 - reason: represented duration is arithmetically consistent and within the configured review threshold
+- deterministic bundle SHA-256: `d4870048e3e34ea2055d53573692c9512fb5e4d567dc67bd7ea626413089f17f`
 
 ## Why this comparison matters
 
@@ -65,6 +67,14 @@ Regression fixtures:
 
 - `tests/fixtures/live/heal-040825-30fc5b9e.json`
 - `tests/fixtures/live/ten-t-070825-07bff93a.json`
+
+Verification on the audited v0.2 branch:
+
+- 20/20 unit tests passed
+- Python compilation passed
+- DDC audit passed all 10 gates
+- real-data provenance checks passed
+- real-data regression expectations passed
 
 Run:
 
