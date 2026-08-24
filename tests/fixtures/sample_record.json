@@ -1,0 +1,9 @@
+{
+  "project_id": "example-project",
+  "evidence": [{"source": "DREAM public API", "source_id": "example-project", "authority_scope": "DREAM public project representation", "observed_at": "2026-08-23T00:00:00Z", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],
+  "source_comparisons": [{"field": "status", "left_label": "DREAM API", "right_label": "DREAM portal", "left_value": "implementation", "right_value": "implementation"}],
+  "relationships": [{"relationship": "sectoralPipeline", "related_id": "pipeline-1", "resolvable_ids": ["pipeline-1"]}],
+  "finance": {"expected": "1000.00", "available": "900.00", "disbursed": "700.00", "spent": "650.00"},
+  "outcome": {"completed": true, "expected_outcomes": ["capacity"], "measured_outcomes": {"capacity": 700}},
+  "transition_evidence": {"required_keys": ["decision_id", "effective_date"], "record": {"decision_id": "decision-1", "effective_date": "2026-08-01"}}
+}
