@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import json
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -30,6 +31,10 @@ PUBLIC_POSITIONING_DOCS = (
 )
 DOMAIN_SPECIFIC_FOREGROUNDING_TERMS = ("corruption", "fraud", "theft", "criminality", "misconduct")
 DISALLOWED_HTTP_WRITE_MARKERS = ('method="POST"', "method='POST'", 'method="PUT"', "method='PUT'", 'method="PATCH"', "method='PATCH'", 'method="DELETE"', "method='DELETE'")
+REAL_DATA_EXPECTATIONS = {
+    "heal-040825-30fc5b9e.json": "REQUIRES_HUMAN_REVIEW",
+    "ten-t-070825-07bff93a.json": "CONSISTENT",
+}
 
 
 def main() -> int:
@@ -65,10 +70,29 @@ def main() -> int:
     if not emitted_states.issubset(ALLOWED_FINDING_STATES):
         failures.append(f"emitted state outside closed taxonomy: {sorted(emitted_states - ALLOWED_FINDING_STATES)}")
 
+    live_dir = TESTS / "fixtures" / "live"
+    for filename, expected_state in REAL_DATA_EXPECTATIONS.items():
+        live_record = json.loads((live_dir / filename).read_text(encoding="utf-8"))
+        parsed = urlparse(str(live_record.get("source_url") or ""))
+        if parsed.scheme != "https" or parsed.hostname != "dream.gov.ua":
+            failures.append(f"real-data provenance: {filename} must point to https://dream.gov.ua")
+        if not live_record.get("observed_at") and not any(item.get("observed_at") for item in live_record.get("evidence", []) if isinstance(item, dict)):
+            failures.append(f"real-data provenance: {filename} lacks observation time")
+        live_bundle = evaluate(live_record)
+        states = [item.get("state") for item in live_bundle.get("findings", [])]
+        if states != [expected_state]:
+            failures.append(f"real-data regression: {filename} emitted {states}, expected {[expected_state]}")
+        if live_bundle.get("inference_boundary") != EXPECTED_INFERENCE_BOUNDARY:
+            failures.append(f"real-data inference boundary drift: {filename}")
+
     adapter_text = (SRC / "dream_lens" / "adapters" / "dream.py").read_text(encoding="utf-8")
     for marker in DISALLOWED_HTTP_WRITE_MARKERS:
         if marker in adapter_text:
             failures.append(f"write-capable HTTP method marker found in DREAM adapter: {marker}")
+
+    rule_text = (SRC / "dream_lens" / "rules.py").read_text(encoding="utf-8")
+    if "REQUIRES_HUMAN_REVIEW" not in rule_text or "max_review_months" not in rule_text:
+        failures.append("temporal review policy drift: review threshold no longer routes through human review")
 
     for path in PUBLIC_POSITIONING_DOCS:
         text = path.read_text(encoding="utf-8").lower()
@@ -89,6 +113,9 @@ def main() -> int:
     print("  fixed DREAM network authority: pass")
     print("  read-only HTTP boundary: pass")
     print("  public positioning boundary: pass")
+    print("  real-data provenance: pass")
+    print("  real-data regression expectations: pass")
+    print("  temporal review-policy boundary: pass")
     return 0
 
 
