@@ -33,6 +33,22 @@ Lens finding:
 
 The Lens does not infer why the values are represented this way.
 
+### Externally confirmed resolution — 2026-08-28
+
+In a written response, the DREAM team confirmed that the atypical HEAL Ukraine duration resulted from incorrect user data entry while completing the public investment project card. According to DREAM, an exact calendar year was entered where the form expected the number of years spent on a stage — for example, `2026` instead of `1`.
+
+DREAM stated that this explains the unusually large represented duration and that the information was passed to the responsible team for follow-up with the user.
+
+This confirmation closes the causal question for this observed case without changing the original deterministic finding. The original Lens bundle remains an immutable record of what was observable at the time of capture:
+
+1. the public representation was internally arithmetic-consistent;
+2. its magnitude crossed the bounded review threshold;
+3. the Lens emitted `REQUIRES_HUMAN_REVIEW` rather than assigning a cause;
+4. the source owner later supplied independent explanatory evidence identifying the data-entry cause;
+5. remediation was handed to the responsible DREAM team.
+
+The resolution therefore demonstrates the intended inference boundary in practice: **detection did not become attribution**. Source-owner confirmation is recorded as a later evidence event and does not retroactively rewrite the original observation or evidence-bundle hash.
+
 ## Observation B — Trans-European Transport Network
 
 Project: `DREAM-UA-070825-07BFF93A`
@@ -61,6 +77,8 @@ The useful question is therefore narrow and reproducible:
 
 > Is the represented duration and unit intentional, or should the public record be corrected or remapped?
 
+The subsequent DREAM confirmation resolved that question for the HEAL Ukraine observation as a user data-entry error while preserving the validity of the original bounded finding.
+
 ## Reproducibility
 
 Regression fixtures:
@@ -85,4 +103,4 @@ PYTHONPATH=src python scripts/ddc_audit.py
 
 ## Authority boundary
 
-DREAM remains authoritative for DREAM records. The Lens preserves public observations and deterministic rule output only. A `REQUIRES_HUMAN_REVIEW` state is a request to verify evidence, not a determination about the underlying project or any actor.
+DREAM remains authoritative for DREAM records. The Lens preserves public observations and deterministic rule output only. A `REQUIRES_HUMAN_REVIEW` state is a request to verify evidence, not a determination about the underlying project or any actor. Later source-owner confirmation can resolve the factual cause of a case, but it is recorded as additional evidence rather than as a retroactive alteration of the original bundle.
